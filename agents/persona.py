@@ -10,17 +10,33 @@ class Persona(Agent):
         self.tiempo_infeccion = 0
 
     def step(self):
-        if self.estado != 'D':
-            self.mover()
-            self.progresar_enfermedad()
-            self.contagiar()
+        self.mover()             # Todos caminan, incluso los infectados
+        self.contagiar()         # Los infectados pueden contagiar vecinos
+        self.progresar_enfermedad()  # Evolución del estado
+
 
     def mover(self):
-        vecinos = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False)
-        destino = self.random.choice(vecinos)
-        agentes_destino = self.model.grid.get_cell_list_contents([destino])
-        if not any(isinstance(a, ObjetoFijo) for a in agentes_destino):
-            self.model.grid.move_agent(self, destino)
+        if not self.objetivo or self.pos == self.objetivo:
+            self.objetivo = self.seleccionar_nuevo_destino()
+        self.mover_hacia(self.objetivo)
+
+    def seleccionar_nuevo_destino(self):
+        # Mover entre cafetería, aula, conversatorio aleatoriamente
+        zonas = ["cafeteria", "aula", "conversatorio"]
+        zona_destino = self.random.choice(zonas)
+        posiciones = [a.pos for a in self.model.schedule.agents if isinstance(a, ObjetoFijo) and a.tipo == zona_destino]
+        return self.random.choice(posiciones) if posiciones else self.pos
+
+    def mover_hacia(self, destino):
+        x, y = self.pos
+        dx = 1 if destino[0] > x else -1 if destino[0] < x else 0
+        dy = 1 if destino[1] > y else -1 if destino[1] < y else 0
+        nueva_pos = (x + dx, y + dy)
+        if self.model.grid.out_of_bounds(nueva_pos):
+            return
+        ocupada = any(isinstance(a, Persona) for a in self.model.grid.get_cell_list_contents([nueva_pos]))
+        if not ocupada:
+            self.model.grid.move_agent(self, nueva_pos)
 
     def contagiar(self):
         if self.estado != 'I':
@@ -37,11 +53,3 @@ class Persona(Agent):
             self.tiempo_infeccion += 1
             if self.tiempo_infeccion >= self.virus.duracion_incubacion:
                 self.estado = 'I'
-                self.tiempo_infeccion = 0
-        elif self.estado == 'I':
-            self.tiempo_infeccion += 1
-            if self.tiempo_infeccion >= self.virus.duracion_infeccion:
-                if random.random() < self.virus.prob_muerte:
-                    self.estado = 'D'
-                else:
-                    self.estado = 'R'

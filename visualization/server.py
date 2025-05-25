@@ -1,6 +1,6 @@
 from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.ModularVisualization import ModularServer
-from model.modelo import EpidemiaModel
+from models.modelo import EpidemiaModel
 from agents.persona import Persona
 from virus import Virus
 

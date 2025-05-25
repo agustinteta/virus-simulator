@@ -1,7 +1,7 @@
 from mesa.visualization.UserParam import UserSettableParameter
 from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.ModularVisualization import ModularServer
-from model.model_concierto import ConciertoCOVIDModel
+from models.model_concierto import ConciertoCOVIDModel
 from agents.persona import Persona
 from agents.objeto_fijo import ObjetoFijo
 
