@@ -5,7 +5,7 @@ from mesa.datacollection import DataCollector
 from agents.persona import Persona
 from agents.objeto_fijo import ObjetoFijo
 from agents.objeto_visual import ZonaVisual
-from virus import Virus
+from agents.virus import Virus
 
 class UniversidadCOVIDModel(Model):
     def __init__(self, num_personas=10, grid_width=300, grid_height=300, duracion_simulacion=300):
