@@ -1,14 +1,11 @@
-# from agents.virus import Virus
-# from models.modelo import EpidemiaModel
+from models.model_universidad import UniversidadCOVIDModel
+from agents.persona import Persona
 
-# virus_covid = Virus("COVID-19", prob_contagio=0.25, duracion_incubacion=3, duracion_infeccion=10, prob_muerte=0.02)
-# modelo = EpidemiaModel(N=100, width=10, height=10, virus=virus_covid)
-
-# for i in range(20):
-#     modelo.step()
-
-# estados = {"S": 0, "E": 0, "I": 0, "R": 0, "D": 0}
-# for agente in modelo.schedule.agents:
-#     estados[agente.estado] += 1
-
-# print(estados)
+modelo = UniversidadCOVIDModel(num_personas=100, grid_width=40, grid_height=40, duracion_simulacion=300)
+for i in range(300):
+    modelo.step()
+estados = {"Sano": 0, "Expuesto": 0, "Infectado": 0}
+for agente in modelo.schedule.agents:
+    if isinstance(agente, Persona):
+        estados[agente.estado] += 1
+print(estados)

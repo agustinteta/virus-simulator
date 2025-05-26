@@ -28,8 +28,6 @@ class UniversidadCOVIDModel(Model):
         self._crear_personas(num_personas)
 
 
-    from agents.objeto_fijo import ObjetoFijo
-
     def _crear_zonas(self, width, height):
         print("Creando zonas en el grid...")
 
