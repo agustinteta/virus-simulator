@@ -8,18 +8,36 @@ class Persona(Agent):
         self.estado = "S"  # S: Sano, E: Expuesto, I: Infectado, R: Recuperado, D: Muerto
         self.virus = virus
         self.tiempo_infeccion = 0
+        self.objetivo = None  # Destino actual de la persona
 
     def step(self):
         self.mover()             # Todos caminan, incluso los infectados
         self.contagiar()         # Los infectados pueden contagiar vecinos
         self.progresar_enfermedad()  # Evolución del estado
 
-
     def mover(self):
-        if not self.objetivo or self.pos == self.objetivo:
-            self.objetivo = self.seleccionar_nuevo_destino()
-        self.mover_hacia(self.objetivo)
-
+        # Obtener vecinos ortogonales y diagonales (Moore)
+        vecinos = self.model.grid.get_neighborhood(
+            self.pos,
+            moore=True,
+            include_center=False
+        )
+        # Filtrar solo celdas que sean parte de una zona, no estén ocupadas por otra Persona, ni sean pared u ObjetoFijo
+        posibles = []
+        for pos in vecinos:
+            # Verifica que la celda sea parte de una zona válida
+            if pos in self.model.zonas:
+                contenido = self.model.grid.get_cell_list_contents([pos])
+                # Verifica que no haya otra Persona ni ObjetoFijo en la celda
+                ocupada = any(isinstance(a, Persona) or isinstance(a, ObjetoFijo) for a in contenido)
+                # Verifica que no sea una pared (asumiendo que paredes están en self.model.paredes)
+                es_pared = hasattr(self.model, "paredes") and pos in self.model.paredes
+                if not ocupada and not es_pared:
+                    posibles.append(pos)
+        if posibles:
+            nueva_pos = self.random.choice(posibles)
+            self.model.grid.move_agent(self, nueva_pos)
+            
     def seleccionar_nuevo_destino(self):
         # Mover entre cafetería, aula, conversatorio aleatoriamente
         zonas = ["cafeteria", "aula", "conversatorio"]
