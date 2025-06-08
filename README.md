@@ -1,4 +1,4 @@
-# Simulador de Virus en Universidad
+# Simulador de Virus en Universidad Atlantida Argentina
 
 Este proyecto simula la propagación de un virus en una población dentro de una universidad, utilizando el framework [Mesa](https://mesa.readthedocs.io/en/stable/). El modelo permite observar cómo se comporta la infección en diferentes espacios (aula, cafetería, aula magna) y bajo distintas condiciones.
 
@@ -31,7 +31,7 @@ pip install -r requirements.txt
 ### Para correr el backend (solo simulación, sin visualización):
 
 ```bash
-python main.py
+python -m main
 ```
 
 ### Para visualizar la simulación en el navegador:
@@ -56,7 +56,3 @@ Puedes modificar los parámetros de la simulación (cantidad de personas, tamañ
 ## Créditos
 
 Proyecto desarrollado por Ortiz Isaias, Sanabria Sebastias y Teta Agustin, para la materia Teoría de Sistemas y Modelos.
-
----
-
-¡Explora cómo se propaga un virus en diferentes escenarios universitarios y experimenta con tus propios parámetros!

@@ -69,14 +69,27 @@ print("Paso 3: Configurando el servidor")
 server = ModularServer(
     UniversidadCOVIDModel,
     [grid, chart],
-    "Simulación Universidad UAA COVID",
+    "Simulación UAA - COVID",
     {
-        "num_personas": 100,
+        "num_personas": 200,
+        "num_infectados": 3,
         "grid_width": grid_width,
         "grid_height": grid_height,
         "duracion_simulacion": 300 # Duración en pasos / 1 paso = 1 minuto
     }
 )
+
+
+server.max_steps = 300  # Duración máxima de la simulación en pasos
+server.description = """Simulación de propagación de COVID-19 en la Universidad Atlantida Argentina, con zonas específicas y 
+agentes que representan personas y objetos fijos. El modelo incluye un virus con características específicas y permite observar 
+la evolución de la infección a lo largo del tiempo.
+
+La simulación muestra cómo las personas interactúan en diferentes zonas (aula, cafetería, aula magna) y cómo se propaga el virus
+entre ellas. Los estados de las personas son: Sano (S), Expuesto (E) e Infectado (I).
+
+Desarrollado por Sanabria Sebastian, Ortiz Isaias y Teta Gustavo, para la materia de Teoria de Modelos y Sistemas en la Universidad Atlantida Argentina.
+"""
 
 print("Paso 4: Configurando el puerto del servidor")
 server.port = 8521  # Puerto de ejecución

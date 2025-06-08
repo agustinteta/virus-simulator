@@ -8,10 +8,10 @@ from agents.objeto_visual import ZonaVisual
 from agents.virus import Virus
 
 class UniversidadCOVIDModel(Model):
-    def __init__(self, num_personas=10, grid_width=300, grid_height=300, duracion_simulacion=300):
+    def __init__(self, num_infectados=1, num_personas=10, grid_width=300, grid_height=300, duracion_simulacion=300):
         self.grid = MultiGrid(grid_width, grid_height, torus=False)
         self.schedule = RandomActivation(self)
-        self.duracion_simulacion = duracion_simulacion
+        self.duracion_simulacion = (duracion_simulacion-1)
         self.datacollector = DataCollector(
             model_reporters={
                 "Sano": lambda m: self.contar_por_estado("S"),
@@ -19,13 +19,13 @@ class UniversidadCOVIDModel(Model):
                 "Infectado": lambda m: self.contar_por_estado("I"),
             }
         )
-        self.virus_covid = Virus("COVID-19", prob_contagio=0.65, duracion_incubacion=300, duracion_infeccion=300, prob_muerte=0)
+        self.virus_covid = Virus("COVID-19", prob_contagio=0.65, duracion_incubacion=500, duracion_infeccion=500, prob_muerte=0)
         self.next_id_val = 0
         self.zonas = {}
 
 
         self._crear_zonas(grid_width, grid_height)
-        self._crear_personas(num_personas)
+        self._crear_personas(num_personas, num_infectados)
 
 
     def _crear_zonas(self, width, height):
@@ -71,8 +71,8 @@ class UniversidadCOVIDModel(Model):
         print("Zonas creadas según el plano.")
 
 
-    def _crear_personas(self, num):
-        print(f"Creando {num} personas en el modelo...")
+    def _crear_personas(self, num, num_infectados=1):
+        print(f"Creando {num} personas en el modelo, con {num_infectados} infectados...")
 
         # Solo celdas que pertenecen a una zona (habitaciones)
         celdas_zona = list(self.zonas.keys())
@@ -83,7 +83,9 @@ class UniversidadCOVIDModel(Model):
         self.random.shuffle(celdas_zona)
 
         for i in range(num):
-            estado = 'I' if i == 0 else 'S'
+            # Asignar estado inicial: infectado o sano
+            # Los primeros `num_infectados` agentes serán infectados, el resto sanos
+            estado = 'I' if i < num_infectados else 'S'
             virus = self.virus_covid if estado == 'I' else None
             agente = Persona(self.next_id(), self, virus=virus)
             agente.estado = estado
@@ -99,6 +101,11 @@ class UniversidadCOVIDModel(Model):
 
 
     def step(self):
+        if self.schedule.steps == self.duracion_simulacion:
+            self.running = False
+            print("Duración de la simulación alcanzada. Finalizando...")
+            print(f"Resultado final: Infectados: {self.contar_por_estado('I')}, Expuestos: {self.contar_por_estado('E')}, Sanos: {self.contar_por_estado('S')}")
+            return
         self.schedule.step()
         self.datacollector.collect(self)
 
